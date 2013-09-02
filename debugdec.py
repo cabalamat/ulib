@@ -2,7 +2,7 @@
 
 import inspect
 
-# this needs to be set to True elsewhere to enable tihs module.
+# this needs to be set to True elsewhere to enable this module.
 # otherwise it will do nothing.
 debugging = False
 

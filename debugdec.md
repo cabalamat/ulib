@@ -1,5 +1,21 @@
 # debugdec
 
+Debugdec contains functions and decorators useful for debugging.
+
+## enabling debugdec
+
+When you are running your code in production, you probably don't 
+want it printing out reams of debugging statements. Nor do you want it 
+slowed down by type checking. Do debugdec only does anything if you
+set a flag in your code telling it to do so:
+
+```python
+import debugdec
+from debugdec import printargs, typ, prvars
+
+debugdec.debugging = True
+```
+
 ## @printargs
 
 The printargs decorator prints the arguments it was called with, and the
