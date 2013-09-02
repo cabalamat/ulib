@@ -27,4 +27,20 @@ fact(4) => 24
 24
 ~~~
 
-end.
+## @typ
+
+The typ decorator does type checking on a function's 
+parameters, and optionally on its return value as well. Example:
+
+~~~
+@typ(int, ret=int)
+def square(x):
+    return x*x
+~~~
+
+This checks that square() receives an ``int`` and returns an ``int``. If
+not, a ``TypeError`` is thrown.
+
+
+
+

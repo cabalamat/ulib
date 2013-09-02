@@ -1,6 +1,10 @@
 # debugdec.py = decorators useful for debugging
 
-import math
+import inspect
+
+# this needs to be set to True elsewhere to enable tihs module.
+# otherwise it will do nothing.
+debugging = False
 
 #---------------------------------------------------------------------
 
@@ -8,6 +12,8 @@ GL_PRINTARGS_DEPTH = 0
 GL_PRINTARGS_INDENT = "| "
 
 def printargs(fn):
+    if not debugging:
+        return fn
     def wrapper(*args, **kwargs):
         global GL_PRINTARGS_DEPTH
         argStr = ", ".join([repr(a) for a in args])
@@ -38,7 +44,7 @@ def foo(x)
 """
 
 def typeName(ty):
-    """ Reyturn the name of a type, e.g.:
+    """ Return the name of a type, e.g.:
     typeName(int) => 'int'
     typeName(Foo) => 'foo'
     typeName((int,str)) => 'int or str'
@@ -65,6 +71,8 @@ class typ:
         """ return a new function that when called, checks
         the arguments before calling the original function. 
         """
+        if not debugging:
+            return fn
         def wrapper(*args):
             # check number of args
             if len(args)<len(self.argTypes):
@@ -75,9 +83,9 @@ class typ:
             for ix, arg in enumerate(args):
                 sbType = self.argTypes[ix] # what the type should be
                 if sbType!=None and not isinstance(arg, sbType):
-                    msg = ("calling %s(), arg[%d]==%r had type of %s,"
+                    msg = ("calling %s(), arg[%d] had type of %s,"
                         " should be %s") % (fn.__name__, 
-                        ix, arg,
+                        ix, 
                         type(arg).__name__,
                         typeName(sbType))
                     raise TypeError(msg)
@@ -92,57 +100,6 @@ class typ:
             return retval
         return wrapper  
 
-#---------------------------------------------------------------------
-
-@typ((int,float), ret=(int,float))
-def square(x): 
-    return x*x
-
-print square(30)   
-print square(34)    
-#print square('x')    
-    
-#---------------------------------------------------------------------
-
-#test:
-
-@printargs
-def baz(x, y):
-    return x*x + y*y
-
-@printargs
-def bar(a):
-    #print "in bar"
-    return baz(a, 5)
-
-@printargs
-def foo(a, b, c):
-    return a + b*bar(c)
-
-foo(10, 20, 30)
-
-foo(10, 20, c=4)
-
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return "Point(%r,%r)" % (self.x, self.y)
-
-    #@printargs
-    def length(self):
-        return math.sqrt(self.x**2 + self.y**2)
-
-
-p = Point(4,5)
-print p.length()
-
-@printargs
-def xyz(): pass
-
-xyz()
 
 #---------------------------------------------------------------------
 
@@ -155,7 +112,8 @@ def _prVarsSelf(cLocals, vn):
     return r
 
 def prvars(varNames =None):
-    import inspect
+    if not debugging: return
+    
     if isinstance(varNames, str):
        vnList = varNames.split()   
     caller = inspect.stack()[1]
@@ -185,35 +143,6 @@ def prvars(varNames =None):
            output += "\n" + outputForSelf + " self.%s=%r"%(insVar,val)
     print output        
     
-
-def afun(zzz):    
-    x = 45
-    y = "hello"
-    prvars("x y")
-    d = (1,2,3)
-    prvars()
-    
-afun(345)
-
-class MyClass:
-    def __init__(self, x, y):
-        self.x = x
-        prvars()
-        self.y = y
-        prvars("x y self.x")
-        prvars()
-
-mc = MyClass(44,55)
-
-class MyNewClass(object):
-    def __init__(self, x, y):
-        self.x = x
-        prvars()
-        self.y = y
-        prvars("x y self.x")
-        prvars()
-
-mnc = MyNewClass(44,55)
 
 #---------------------------------------------------------------------
 
