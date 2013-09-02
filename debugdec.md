@@ -5,7 +5,7 @@
 The printargs decorator prints the arguments it was called with, and the
 return value. Example:
 
-```
+```python
 @printargs
 def fact(n):
     if n<2: return 1
@@ -14,7 +14,7 @@ def fact(n):
 
 When `fact(4)` is run from the Python REPL, you get:
 
-```
+```python
 >>> fact(4)
 fact(4)
 | fact(3)
@@ -32,7 +32,7 @@ fact(4) => 24
 The typ decorator does type checking on a function's 
 parameters, and optionally on its return value as well. Example:
 
-```
+```python
 @typ(int, ret=int)
 def square(x):
     return x*x
@@ -41,6 +41,54 @@ def square(x):
 This checks that square() receives an `int` and returns an `int`. If
 not, a `TypeError` is thrown.
 
+You can also allow a parapeter or return valure to be more than one type,
+for example:
 
+```python
+@typ((int,float), ret=(int,float))
+def square(x):
+    return x*x
+```
+
+`@typ` works correctly if decorating a method, for example this works
+as expected:
+
+```python
+class Foo:
+    def __init__(self):
+        self.v = 0
+        
+    @typ(int, ret=int)    
+    def add(self, n):
+        self.v += n
+        return self.v
+```
+
+How does `@typ` know that a function is a method? It checks whether the 
+name of the first parameter is `self`. So if you use the normal Python 
+naming convention, it will work.
+
+## prvars()
+
+The `prvars()` function prints the local variables of the function it is
+called from. If it is called with no argument, it prints all local variables:
+
+```python
+>>> from debugdec import *
+>>> def foo():
+...     x = 1
+...     y = 2
+...     prvars()
+...     return 3
+... 
+>>> 
+>>> foo()
+foo():4 x=1 y=2
+3
+```
+
+You can also tell `prvars()` which varaibles to print. To do this, you
+put them in a string, separasted by spaces, so `prvars("x y z")`
+will print the `x`, `y` and `z` variables.
 
 

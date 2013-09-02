@@ -73,14 +73,19 @@ class typ:
         """
         if not debugging:
             return fn
+        isMethod = inspect.getargspec(fn).args[0] == 'self'   
         def wrapper(*args):
+            if isMethod:
+                checkArgs = args[1:]
+            else:    
+                checkArgs = args
             # check number of args
-            if len(args)<len(self.argTypes):
+            if len(checkArgs)<len(self.argTypes):
                 msg = ("%s() called with too few args (%d), should be >=%d"
-                    % (fn.__name__, len(args), len(self.argTypes)))
+                    % (fn.__name__, len(checkArgs), len(self.argTypes)))
                 raise TypeError(msg)
             # check args
-            for ix, arg in enumerate(args):
+            for ix, arg in enumerate(checkArgs):
                 sbType = self.argTypes[ix] # what the type should be
                 if sbType!=None and not isinstance(arg, sbType):
                     msg = ("calling %s(), arg[%d] had type of %s,"
