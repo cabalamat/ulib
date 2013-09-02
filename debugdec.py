@@ -117,8 +117,7 @@ def _prVarsSelf(cLocals, vn):
     return r
 
 def prvars(varNames =None):
-    if not debugging: return
-    
+    if not debugging: return  
     if isinstance(varNames, str):
        vnList = varNames.split()   
     caller = inspect.stack()[1]

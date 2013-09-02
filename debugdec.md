@@ -87,8 +87,13 @@ foo():4 x=1 y=2
 3
 ```
 
-You can also tell `prvars()` which varaibles to print. To do this, you
-put them in a string, separasted by spaces, so `prvars("x y z")`
+As you can see from the above, `prvars()` prints the name of the function 
+and the line number withing the file where `prvars()` was called. This is
+so that you can have multiple `prvars()` statements within the same function, 
+and your output will make it clear which one is being executed.
+
+You can also tell `prvars()` which variables to print. To do this, you
+put them in a string, separated by spaces, so `prvars("x y z")`
 will print the `x`, `y` and `z` variables.
 
 
