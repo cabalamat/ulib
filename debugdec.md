@@ -91,13 +91,13 @@ How does `@typ` know that a function is a method? It checks whether the
 name of the first parameter is `self`. So if you use the normal Python 
 naming convention, it will work.
 
-### limitations of @typ
+### Limitations of @typ
 
 1. It required that functions have a fixed number of arguments. A 
 variable number of arguments is not supported, nor are keyword arguments.
 
 2. It cannot compose types. By this I mean that you can say that an
-argument is a `dict` but you can't say that it is a `dict` whose keys
+argument is a `dict`, but you can't say that it is a `dict` whose keys
 are all strings and whose values are all ints.
 
 ## prvars()

@@ -14,26 +14,26 @@ debugging = False
 
 #---------------------------------------------------------------------
 
-GL_PRINTARGS_DEPTH = 0
-GL_PRINTARGS_INDENT = "| "
+_PRINTARGS_DEPTH = 0
+_PRINTARGS_INDENT = "| "
 
 def printargs(fn):
     if not debugging:
         return fn
     def wrapper(*args, **kwargs):
-        global GL_PRINTARGS_DEPTH
+        global _PRINTARGS_DEPTH
         argStr = ", ".join([repr(a) for a in args])
         kwargStr = ", ".join(["%s=%r"%(k,v) for v,k in enumerate(kwargs)])
         comma = ""
         if argStr and kwargStr: comma = ", "
         akStr = argStr + comma + kwargStr
-        print '%s%s(%s)' % (GL_PRINTARGS_INDENT * GL_PRINTARGS_DEPTH,
+        print '%s%s(%s)' % (_PRINTARGS_INDENT * _PRINTARGS_DEPTH,
            fn.__name__, akStr)
-        GL_PRINTARGS_DEPTH += 1
+        _PRINTARGS_DEPTH += 1
         retVal = fn(*args, **kwargs)
-        GL_PRINTARGS_DEPTH -= 1
+        _PRINTARGS_DEPTH -= 1
         if retVal != None:
-            print "%s%s(%s) => %r" % (GL_PRINTARGS_INDENT * GL_PRINTARGS_DEPTH,
+            print "%s%s(%s) => %r" % (_PRINTARGS_INDENT * _PRINTARGS_DEPTH,
                fn.__name__, akStr,
                retVal)
         return retVal
@@ -44,7 +44,7 @@ def printargs(fn):
 Type checking works like this:
 
 @typ(int, ret=int)
-def foo(x)
+def foo(x):
     return x*x
 
 """
@@ -52,7 +52,7 @@ def foo(x)
 def typeName(ty):
     """ Return the name of a type, e.g.:
     typeName(int) => 'int'
-    typeName(Foo) => 'foo'
+    typeName(Foo) => 'Foo'
     typeName((int,str)) => 'int or str'
     @param ty [type|tuple of type]
     @return [str]
