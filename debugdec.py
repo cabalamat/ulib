@@ -1,5 +1,11 @@
 # debugdec.py = decorators useful for debugging
 
+"""
+(c) 2013 Philip Hunt, cabalamat@gmail.com
+You may use this software under the terms of the MIT license. See file
+<LICENSE> for details.
+"""
+
 import inspect
 
 # this needs to be set to True elsewhere to enable this module.
