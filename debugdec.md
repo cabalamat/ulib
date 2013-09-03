@@ -1,12 +1,13 @@
-# debugdec
+# Debugdec
 
-Debugdec contains functions and decorators useful for debugging.
+The Debugdec module (`debugdec.py`) contains functions and decorators 
+useful for debugging.
 
-## enabling debugdec
+## Enabling debugdec
 
 When you are running your code in production, you probably don't 
 want it printing out reams of debugging statements. Nor do you want it 
-slowed down by type checking. Do debugdec only does anything if you
+slowed down by type checking. So debugdec only does anything if you
 set a flag in your code telling it to do so:
 
 ```python
