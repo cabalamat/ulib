@@ -62,9 +62,9 @@ def square(x):
 ```
 
 This checks that `square()` receives an `int` and returns an `int`. If
-not, a `TypeError` is thrown.
+not, `@typ` raises a `TypeError`.
 
-You can also allow a parameter or return valure to be more than one type,
+You can also allow a parameter or return value to be more than one type,
 for example:
 
 ```python

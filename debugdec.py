@@ -7,6 +7,7 @@ You may use this software under the terms of the MIT license. See file
 """
 
 import inspect
+import functools
 
 # this needs to be set to True elsewhere to enable this module.
 # otherwise it will do nothing.
@@ -20,6 +21,7 @@ _PRINTARGS_INDENT = "| "
 def printargs(fn):
     if not debugging:
         return fn
+    @functools.wraps(fn)    
     def wrapper(*args, **kwargs):
         global _PRINTARGS_DEPTH
         argStr = ", ".join([repr(a) for a in args])
@@ -79,7 +81,8 @@ class typ:
         """
         if not debugging:
             return fn
-        isMethod = inspect.getargspec(fn).args[0] == 'self'   
+        isMethod = inspect.getargspec(fn).args[0] == 'self'     
+        @functools.wraps(fn)  
         def wrapper(*args):
             if isMethod:
                 checkArgs = args[1:]
