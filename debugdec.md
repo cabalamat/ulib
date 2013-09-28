@@ -93,7 +93,7 @@ naming convention, it will work.
 
 ### Limitations of @typ
 
-1. It required that functions have a fixed number of arguments. A 
+1. It requires functions to have a fixed number of arguments. A 
 variable number of arguments is not supported, nor are keyword arguments.
 
 2. It cannot compose types. By this I mean that you can say that an
