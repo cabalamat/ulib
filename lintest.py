@@ -1,9 +1,9 @@
 # lintest.py = linear regression testing
 
 """***
-linear regression testing
+linear testing framework
 
-Last altered: 4-Sep-2008
+Last altered: 20-Jan-2014
 
 History:
 6-May-2004: created
@@ -19,11 +19,15 @@ whether a directory exists.
 31-Jul-2013: added 'require' facility so a TestCase can require other 
 TestCases to be run before it. This is tested in <test_require.py>.
 
+16-Jan-2014 added assertApprox for approximate comparisons of f.p. 
+numbers
+
 ***"""
 
 import sys, os.path, stat
 
-import butil
+import butil, termcolours
+tc = termcolours.TermColours
 
 
 #---------------------------------------------------------------------
@@ -34,6 +38,16 @@ debug = False
 assertionsPassed = 0
 functionsPassed = 0
 testCasesRun = []
+
+#---------------------------------------------------------------------
+
+class ColoursMixin:
+    PASSED = tc.GREEN + "PASSED" + tc.NORMAL
+    FAILED = tc.RED + "FAILED" + tc.NORMAL
+    
+    # colours for a line noting entry into a test method
+    TEST_METHOD_LINE = tc.BLUE
+    NORMAL = tc.NORMAL
 
 #---------------------------------------------------------------------
 
@@ -68,10 +82,15 @@ class Test(object):
             return ""
 
     def printTestResults(self):
-        p = "** Passed %d assertions in %d test functions **" \
+        p = "Passed %d assertions in %d test functions" \
            % (assertionsPassed, functionsPassed)
-        ptop = "*" * len(p)
-        print "\n%s\n%s\n%s" % (ptop, p, ptop)
+        ptop = "*" * (len(p)+6)
+        ptop = tc.GREEN + ptop + tc.NORMAL
+        s2 = tc.GREEN + "**" + tc.NORMAL
+        print "\n%s\n%s %s %s\n%s" % (
+            ptop,
+            s2, p, s2,
+            ptop)
 
 #---------------------------------------------------------------------
 """***
@@ -110,7 +129,7 @@ def dirExists(fn):
     mode = os.stat(fn).st_mode
     return stat.S_ISDIR(mode)
 
-class FileAssertionMixin:
+class FileAssertionMixin(ColoursMixin):
 
     def assertFileExists(self, pan, comment=""):
         """ does file (pan) exist?
@@ -205,12 +224,12 @@ Superclass for the user's test cases
 
 ***"""
 
-class TestCase(Test, FileAssertionMixin):
+class TestCase(Test, FileAssertionMixin, ColoursMixin):
 
     def passedTest(self, msg):
         global assertionsPassed
         assertionsPassed += 1
-        print "%s - PASSED (%d)" % (msg, assertionsPassed)
+        print "%s - %s (%d)" % (msg, self.PASSED, assertionsPassed)
 
     #========================================================
     # assertions
@@ -228,6 +247,24 @@ class TestCase(Test, FileAssertionMixin):
             msg = "FAILED: %sassertEqual\nr = %r\nsb= %r" % (com2, r, sb)
             raise AssertionError, msg
     assertSame = assertEqual
+    
+    def assertApprox(self, r, sb, comment=""):
+        com2 = ""
+        if comment:
+            com2 = comment + "; "
+        epsilon = 0.0001
+        bigger = 1 + epsilon
+        smaller = 1 - epsilon
+        ok = (r == sb
+              or sb*smaller < r < sb*bigger
+              or sb*smaller > r > sb*bigger
+        )
+        if ok:
+            msg = "%sr=%r" % (com2, r)
+            self.passedTest(msg)
+        else:
+            msg = "FAILED: %sassertApprox\nr = %r\nsb= %r" % (com2, r, sb)
+            raise AssertionError, msg
 
     def assertNotEqual(self, r, snb, comment=""):
         com2 = ""
@@ -294,8 +331,13 @@ class TestCase(Test, FileAssertionMixin):
             self.doRun("setUp")
             kn = self.__class__.__name__
             funName = test.func_code.co_name
-            print "%s=== %s%s.%s ===" \
-                % (self.optCR, self._pnTxt(), kn, funName)
+            funLineNum = test.func_code.co_firstlineno
+            print "%s%s=== %s%s.%s:%d ===%s" \
+                % (self.optCR, 
+                   self.TEST_METHOD_LINE,
+                   self._pnTxt(), kn, funName,
+                   funLineNum,
+                   self.NORMAL)
             test(self)
             functionsPassed += 1
             self.doRun("tearDown")
@@ -315,8 +357,11 @@ class TestCase(Test, FileAssertionMixin):
 
     def doRun(self, methodName):
         if self.canRun(methodName):
-            print "%s@@@ %s.%s()" % (self.optCR,
-               self.__class__.__name__, methodName)
+            print "%s%s@@@ %s.%s()%s" % (
+                self.optCR,
+                self.TEST_METHOD_LINE,
+                self.__class__.__name__, methodName,
+                self.NORMAL)
             exec("self.%s()" % methodName)
             self.optCR = ""
 
@@ -364,7 +409,9 @@ class TestCase(Test, FileAssertionMixin):
             r = self.requires
         except:
             r = []
-        if not isinstance(r, list):
+        if isinstance(r, tuple):  
+            r = list(r)
+        elif not isinstance(r, list):
             r = [r]
         return r    
         
