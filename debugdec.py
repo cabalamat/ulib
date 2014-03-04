@@ -1,12 +1,13 @@
 # debugdec.py = decorators useful for debugging
 
 """
-(c) 2013 Philip Hunt, cabalamat@gmail.com
+(c) 2013,2014 Philip Hunt, cabalamat@gmail.com
 You may use this software under the terms of the MIT license. See file
 <LICENSE> for details.
 """
 
 import inspect
+import datetime
 import functools
 
 # this needs to be set to True elsewhere to enable this module.
@@ -40,6 +41,24 @@ def printargs(fn):
                retVal)
         return retVal
     return wrapper
+
+#---------------------------------------------------------------------
+"""
+This decorator prints to stdout how long a function took to run.
+"""
+
+def timing(fn):
+    if not debugging:
+        return fn
+    def wrapper(*args, **kwargs):
+        before = datetime.datetime.now()
+        retVal = fn(*args, **kwargs)
+        after = datetime.datetime.now()
+        elapsed = after - before
+        ms = elapsed.total_seconds()*1000.0
+        print "%s() took %.3f ms" % (fn.__name__, ms)
+        return retVal
+    return wrapper    
 
 #---------------------------------------------------------------------
 """
@@ -155,6 +174,28 @@ def prvars(varNames =None):
            val = selfOb.__dict__[insVar]
            output += "\n" + outputForSelf + " self.%s=%r"%(insVar,val)
     print output        
+    
+
+#---------------------------------------------------------------------
+
+def getCallerLocals():
+    """
+    Get the local variables for the function that called the function
+    that called this function (i.e. two call stack levels back)
+    @return [dict]
+    """
+    caller2 = inspect.stack()[2]
+    return caller2[0].f_locals
+    
+def getCallerLocal(varName):
+    """
+    Get a local variable for the function that called the function
+    that called this function (i.e. two call stack levels back)
+    @param varName [str] the name of the variable we want
+    @return [dict]
+    """
+    caller2 = inspect.stack()[2]
+    return caller2[0].f_locals[varName]
     
 
 #---------------------------------------------------------------------
