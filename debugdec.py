@@ -9,10 +9,10 @@ You may use this software under the terms of the MIT license. See file
 import inspect
 import datetime
 import functools
+import sys
 
-# this needs to be set to True elsewhere to enable this module.
-# otherwise it will do nothing.
-debugging = False
+# if you want to disable this module, set this to False eleswhere.
+debugging = True
 
 #---------------------------------------------------------------------
 
@@ -135,7 +135,6 @@ class typ:
 
 
 #---------------------------------------------------------------------
-
 # print values
 
 def _prVarsSelf(cLocals, vn):
@@ -173,7 +172,8 @@ def prvars(varNames =None):
         for insVar in sorted(selfOb.__dict__.keys()):
            val = selfOb.__dict__[insVar]
            output += "\n" + outputForSelf + " self.%s=%r"%(insVar,val)
-    print output        
+    print output
+    sys.stderr.write(output + "\n")
     
 
 #---------------------------------------------------------------------
