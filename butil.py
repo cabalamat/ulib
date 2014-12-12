@@ -1,11 +1,11 @@
 # butil.py = low-level utilities
 
-"""***
-1-Jul-2014:
-added readFileUtf8(), writeFileUtf8() functions, to handle reading utf-8
-files into unicode objects and vice versa.
+"""
+History:
 
-***"""
+16-Sep-2014: added mystr() function
+
+"""
 
 import os, os.path, stat, glob, fnmatch
 import string, datetime, pprint
@@ -233,40 +233,9 @@ def writeFile(filename, newValue):
     if dirName:
         if not entityExists(dirName):
             os.makedirs(dirName)
+
     f = open(pn, 'w')
     f.write(newValue)
-    f.close()
-
-
-def readFileUtf8(filename):
-    """ A file contains unicode text, encoded as utf-8.
-    Save this into a unicode object.
-    @param filename::str = pathname to file
-    @return::unicode
-    """
-    pn = normalizePath(filename)
-    f = open(pn, 'r')
-    s = f.read()
-    f.close()
-    u = s.decode('utf8', 'ignore')
-    return u
-
-
-
-def writeFileUtf8(filename, newValue):
-    """ write Unicode text to a file, using the utf-8 encoding
-    @param filename::str = the pathname to the file
-    @param newValue::unicode = the data to be written
-    """
-    pn = normalizePath(filename)
-
-    # create directories if they don't exist
-    dirName = os.path.dirname(pn)
-    if dirName:
-        if not entityExists(dirName):
-            os.makedirs(dirName)
-    f = open(pn, 'w')
-    f.write(newValue.encode('utf8'))
     f.close()
 
 
@@ -285,6 +254,11 @@ def writePretty(filename, object):
     pp = pprint.PrettyPrinter(indent=2)
     objectAsPretty = pp.pformat(object)
     writeFile(filename, objectAsPretty)
+
+def pretty(ob, indent=4):
+    pp = pprint.PrettyPrinter(indent)
+    s = pp.pformat(ob)
+    return s
 
 #---------------------------------------------------------------------
 
@@ -319,6 +293,37 @@ def fromtostep(f, t, step):
     return result
 
 
+def resizeTuple(t, newSize, newValues=None):
+    """ resize a tuple
+    @param t::()
+    @param newSize::int = the new size of the tuple
+    @param newValues = what values to put in any new required elements
+    """
+    if len(t)==newSize:
+        return t
+    elif len(t)>newSize:
+        return tuple(list(t)[:newSize])
+    else:
+        # tuple is too small
+        a = list(t)
+        numNew = newSize - len(a)
+        a = a + [newValues]*numNew
+        return tuple(a)
+
+
+def unique(a):
+    """ remove duplicates from a list.
+    @param a::[] = an array of something (contents must be hashable)
+    @return::[] = same as (a) but with duplicates removed
+    """
+    inserted = set()
+    r = []
+    for e in a:
+        if e not in inserted:
+            r.append(e)
+            inserted.add(e)
+    return r
+
 #---------------------------------------------------------------------
 
 def niceMe(newNice):
@@ -336,6 +341,19 @@ def getYN(question):
     answer = raw_input(question + " (Y/N)?")
     isYes = string.upper(answer[:1]) == "Y"
     return isYes
+
+def exValue(f, orValue):
+    """ Evaluate function f. If it returns a value, return it.
+    If it throws an exception, return (orValue) instead
+    @param f::function
+    @param orValue
+    """
+    r = orValue
+    try:
+        r = f()
+    except:
+        r = orValue
+    return r
 
 #---------------------------------------------------------------------
 
@@ -442,7 +460,21 @@ def getInt(s, notFoundReturn=-1):
     numStr = s[firstIx:to]
     return int(numStr)
 
+def myStr(x):
+    """ My version of the str() conversion function. This converts any
+    type into a str. If x is a unicode, it is converted into a utf-8
+    bytestream.
+    @param x = a value of some type
+    @return::str
+    """
+    if type(x)==unicode:
+        return x.encode('utf-8')
+    else:
+        return str(x)
+mystr = myStr
 
+def form(s, *args, **kwargs):
+    return s.format(*args, **kwargs)
 
 #---------------------------------------------------------------------
 

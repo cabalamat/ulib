@@ -30,13 +30,13 @@ def printargs(fn):
         comma = ""
         if argStr and kwargStr: comma = ", "
         akStr = argStr + comma + kwargStr
-        print '%s%s(%s)' % (_PRINTARGS_INDENT * _PRINTARGS_DEPTH,
+        prNo('%s%s(%s)', _PRINTARGS_INDENT * _PRINTARGS_DEPTH,
            fn.__name__, akStr)
         _PRINTARGS_DEPTH += 1
         retVal = fn(*args, **kwargs)
         _PRINTARGS_DEPTH -= 1
         if retVal != None:
-            print "%s%s(%s) => %r" % (_PRINTARGS_INDENT * _PRINTARGS_DEPTH,
+            prNo("%s%s(%s) => %r", _PRINTARGS_INDENT * _PRINTARGS_DEPTH,
                fn.__name__, akStr,
                retVal)
         return retVal
@@ -174,6 +174,29 @@ def prvars(varNames =None):
            output += "\n" + outputForSelf + " self.%s=%r"%(insVar,val)
     sys.stderr.write(output + "\n")
 
+
+#---------------------------------------------------------------------
+
+def pr(formatStr, *args):
+    caller = inspect.stack()[1]
+    cLocals = caller[0].f_locals # local variables of caller
+    fileLine = caller[2]
+    functionName = caller[3]
+
+    if len(args)>0:
+        s = formatStr % args
+    else:
+        s = formatStr
+    t = "%s():%d: " % (functionName, fileLine)
+    sys.stderr.write(t + s + "\n")
+
+def prNo(formatStr, *args):
+    """ as pr() but with no line numbers prepended """
+    if len(args)>0:
+        s = formatStr % args
+    else:
+        s = formatStr
+    sys.stderr.write(s + "\n")
 
 #---------------------------------------------------------------------
 
