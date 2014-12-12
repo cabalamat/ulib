@@ -22,7 +22,7 @@ _PRINTARGS_INDENT = "| "
 def printargs(fn):
     if not debugging:
         return fn
-    @functools.wraps(fn)    
+    @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         global _PRINTARGS_DEPTH
         argStr = ", ".join([repr(a) for a in args])
@@ -58,7 +58,7 @@ def timing(fn):
         ms = elapsed.total_seconds()*1000.0
         print "%s() took %.3f ms" % (fn.__name__, ms)
         return retVal
-    return wrapper    
+    return wrapper
 
 #---------------------------------------------------------------------
 """
@@ -90,22 +90,22 @@ class typ:
         self.argTypes = argTypes
         if retType.has_key('ret'):
             self.ret = retType['ret']
-        else:    
+        else:
             self.ret = None
-        
-        
+
+
     def __call__(self, fn):
         """ return a new function that when called, checks
-        the arguments before calling the original function. 
+        the arguments before calling the original function.
         """
         if not debugging:
             return fn
-        isMethod = inspect.getargspec(fn).args[0] == 'self'     
-        @functools.wraps(fn)  
+        isMethod = inspect.getargspec(fn).args[0] == 'self'
+        @functools.wraps(fn)
         def wrapper(*args):
             if isMethod:
                 checkArgs = args[1:]
-            else:    
+            else:
                 checkArgs = args
             # check number of args
             if len(checkArgs)<len(self.argTypes):
@@ -117,8 +117,8 @@ class typ:
                 sbType = self.argTypes[ix] # what the type should be
                 if sbType!=None and not isinstance(arg, sbType):
                     msg = ("calling %s(), arg[%d] had type of %s,"
-                        " should be %s") % (fn.__name__, 
-                        ix, 
+                        " should be %s") % (fn.__name__,
+                        ix,
                         type(arg).__name__,
                         typeName(sbType))
                     raise TypeError(msg)
@@ -126,12 +126,12 @@ class typ:
             # check return type
             if self.ret!=None and not isinstance(retval, self.ret):
                 msg = ("%s() returns type of %s,"
-                        " should be %s") % (fn.__name__, 
+                        " should be %s") % (fn.__name__,
                         type(retval).__name__,
                         typeName(self.ret))
                 raise TypeError(msg)
             return retval
-        return wrapper  
+        return wrapper
 
 
 #---------------------------------------------------------------------
@@ -144,9 +144,9 @@ def _prVarsSelf(cLocals, vn):
     return r
 
 def prvars(varNames =None):
-    if not debugging: return  
+    if not debugging: return
     if isinstance(varNames, str):
-       vnList = varNames.split()   
+       vnList = varNames.split()
     caller = inspect.stack()[1]
     cLocals = caller[0].f_locals # local variables of caller
     #print cLocals
@@ -160,21 +160,20 @@ def prvars(varNames =None):
         for vn in sorted(cLocals.keys()):
             output += " %s=%r" %(vn, cLocals[vn])
         if cLocals.has_key('self'): printAllSelf = True
-    else:    
+    else:
         for vn in vnList:
             if vn.startswith("self."):
-               output += _prVarsSelf(cLocals, vn)     
+               output += _prVarsSelf(cLocals, vn)
             elif cLocals.has_key(vn):
-               output += " %s=%r" %(vn, cLocals[vn]) 
+               output += " %s=%r" %(vn, cLocals[vn])
                if vn=='self': printAllSelf = True
     if printAllSelf:
         selfOb = cLocals['self']
         for insVar in sorted(selfOb.__dict__.keys()):
            val = selfOb.__dict__[insVar]
            output += "\n" + outputForSelf + " self.%s=%r"%(insVar,val)
-    print output
     sys.stderr.write(output + "\n")
-    
+
 
 #---------------------------------------------------------------------
 
@@ -186,7 +185,7 @@ def getCallerLocals():
     """
     caller2 = inspect.stack()[2]
     return caller2[0].f_locals
-    
+
 def getCallerLocal(varName):
     """
     Get a local variable for the function that called the function
@@ -196,7 +195,7 @@ def getCallerLocal(varName):
     """
     caller2 = inspect.stack()[2]
     return caller2[0].f_locals[varName]
-    
+
 
 #---------------------------------------------------------------------
 

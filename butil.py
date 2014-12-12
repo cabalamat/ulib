@@ -1,5 +1,12 @@
 # butil.py = low-level utilities
 
+"""***
+1-Jul-2014:
+added readFileUtf8(), writeFileUtf8() functions, to handle reading utf-8
+files into unicode objects and vice versa.
+
+***"""
+
 import os, os.path, stat, glob, fnmatch
 import string, datetime, pprint
 
@@ -226,9 +233,40 @@ def writeFile(filename, newValue):
     if dirName:
         if not entityExists(dirName):
             os.makedirs(dirName)
-
     f = open(pn, 'w')
     f.write(newValue)
+    f.close()
+
+
+def readFileUtf8(filename):
+    """ A file contains unicode text, encoded as utf-8.
+    Save this into a unicode object.
+    @param filename::str = pathname to file
+    @return::unicode
+    """
+    pn = normalizePath(filename)
+    f = open(pn, 'r')
+    s = f.read()
+    f.close()
+    u = s.decode('utf8', 'ignore')
+    return u
+
+
+
+def writeFileUtf8(filename, newValue):
+    """ write Unicode text to a file, using the utf-8 encoding
+    @param filename::str = the pathname to the file
+    @param newValue::unicode = the data to be written
+    """
+    pn = normalizePath(filename)
+
+    # create directories if they don't exist
+    dirName = os.path.dirname(pn)
+    if dirName:
+        if not entityExists(dirName):
+            os.makedirs(dirName)
+    f = open(pn, 'w')
+    f.write(newValue.encode('utf8'))
     f.close()
 
 
