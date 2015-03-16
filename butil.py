@@ -5,9 +5,11 @@ History:
 
 16-Sep-2014: added mystr() function
 
+12-Feb-2015: added makeEmptyDir() function
+
 """
 
-import os, os.path, stat, glob, fnmatch
+import os, os.path, stat, glob, fnmatch, shutil
 import string, datetime, pprint
 
 debug=False # debugging this module?
@@ -33,6 +35,18 @@ def entityExists(fn):
     fn = os.path.expanduser(fn)
     exists = os.access(fn, os.F_OK)
     return exists
+
+def makeEmptyDir(dirPan):
+    """ Cause dirPan to be an existing directory thsat is empty
+    @param dirPan::str = pathname to directory
+    """
+    if entityExists(dirPan):
+        if isDir(dirPan):
+            shutil.rmtree(dirPan)
+        else:
+            os.remove(dirPan)
+    os.makedirs(dirPan)
+
 
 def fileExists(fn):
     """ Does a file exist?
@@ -75,7 +89,7 @@ def yy_getFilenames(dir, pattern):
     print "getFilenames(%r, %r) ==> %r" % (dir, pattern, filenames)
     return filenames
 
-def getFilenames(dir, pattern):
+def getFilenames(dir, pattern="*"):
     """ Return a list of all the filenames in a directory that match a
     pattern. Note that this by default returns files and subdirectories.
     @param dir [string] a directory
@@ -192,7 +206,7 @@ def _getCommonPrefixDir(pd1, pd2):
 def getRelativePath(toPan, fromDir):
     """ Return a relative path to a file, starting from a directory.
     @param toPan [string] = pathname of file to go to
-    @param fromDir [string] = diretory to come from
+    @param fromDir [string] = directory to come from
     @return [string]
     """
     #>>>>> expand ~
