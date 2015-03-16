@@ -37,7 +37,7 @@ def entityExists(fn):
     return exists
 
 def makeEmptyDir(dirPan):
-    """ Cause dirPan to be an existing directory thsat is empty
+    """ Cause dirPan to be an existing directory that is empty
     @param dirPan::str = pathname to directory
     """
     if entityExists(dirPan):
